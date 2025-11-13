@@ -1,6 +1,6 @@
 {
     "name": "ODriveArduino",
-    "version": "1.0.1-apha",
+    "version": "1.0.2",
     "description": "a library for ODrive motor controllers",
     "keywords": [
         "odrive",
