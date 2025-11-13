@@ -6,7 +6,7 @@
 template<class T> inline Print& operator <<(Print& obj, T arg) { obj.print(arg);    return obj; }
 template<>        inline Print& operator <<(Print& obj, float arg) { obj.print(arg, 4); return obj; }
 
-ODriveArduino::ODriveArduino(const Stream& serial) {
+ODriveArduino::ODriveArduino(Stream& serial) : serial_(serial) {
     this->serial_ = serial;
 }
 
@@ -39,6 +39,13 @@ float ODriveArduino::getVelocity(int motor_number) {
 float ODriveArduino::getPosition(int motor_number) {
     this->serial_ << "r axis" << motor_number << ".encoder.pos_estimate\n";
     return ODriveArduino::readFloat();
+}
+
+float ODriveArduino::getPositionF(int motor_number) {
+    this->serial_ << "f " << motor_number << "\n";
+    String pos_vel = ODriveArduino::readString();
+    String pos = pos_vel.substring(0, pos_vel.indexOf(' '));
+    return pos.toFloat();
 }
 
 int32_t ODriveArduino::readInt() {

@@ -12,11 +12,6 @@ private:
      */
     Stream& serial_;
 
-    /**
-     * @brief Read a response from the ODrive in serial.
-     * @return The response as a String.
-     */
-    String readString();
 
 public:
     /**
@@ -24,7 +19,7 @@ public:
      *
      * @param[in] serial The serial port to use to communicate with the ODrive
      */
-    ODriveArduino(const Stream& serial);
+    ODriveArduino(Stream& serial);
 
     /**
      * @brief Set the Position of a motor
@@ -81,6 +76,14 @@ public:
      */
     float getPosition(int motor_number);
 
+    /**
+     * @brief Get the Position of a motor with a command "f"
+     *
+     * @param[in] motor_number The motor to get the position of
+     * @return float The position of the motor
+     */
+    float getPositionF(int motor_number);
+
 
     /**
      * @brief get the response value in float
@@ -107,6 +110,12 @@ public:
      * @return false the state was not reached within the timeout.
      */
     bool runState(int axis, int requested_state, bool wait_for_idle, float timeout = 10.0f);
+
+    /**
+     * @brief Read a response from the ODrive in serial.
+     * @return The response as a String.
+     */
+    String readString();
 };
 
 #endif  // ODRIVE_ARDUINO_H
