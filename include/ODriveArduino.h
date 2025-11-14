@@ -120,6 +120,11 @@ public:
 
     void enableWatchdog(int motor_number, bool enable);
 
+    uint32_t getErrors(int motor_number);
+
+    String decodeErrors(int32_t errorCode);
+
+
     /**
      * @brief Read a response from the ODrive in serial.
      * @return The response as a String.

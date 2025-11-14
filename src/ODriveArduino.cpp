@@ -83,6 +83,42 @@ void ODriveArduino::updateWatchdog(int motor_number) {
     this->serial_ << "u" << motor_number << "\n";
 }
 
+uint32_t ODriveArduino::getErrors(int motor_number) {
+    uint32_t errCode;
+    this->serial_ << "r axis" << motor_number << ".active_errors\n";
+    errCode = (uint32_t)readInt();
+    this->serial_ << "r axis" << motor_number << ".disarm_reason\n";
+    errCode = errCode | (uint32_t)readInt();    
+    return errCode;
+}
+
+String ODriveArduino::decodeErrors(int32_t errorCode) {
+    String errDescr;
+    errDescr.clear();
+    if ((errorCode & ODRIVE_ERROR_INITIALIZING)              > 0) errDescr.concat("Initializing; ");
+    if ((errorCode & ODRIVE_ERROR_SYSTEM_LEVEL)              > 0) errDescr.concat("System level error; ");
+    if ((errorCode & ODRIVE_ERROR_TIMING_ERROR)              > 0) errDescr.concat("Timing error; ");
+    if ((errorCode & ODRIVE_ERROR_MISSING_ESTIMATE)          > 0) errDescr.concat("Missing estimate; ");
+    if ((errorCode & ODRIVE_ERROR_BAD_CONFIG)                > 0) errDescr.concat("Bad config; ");
+    if ((errorCode & ODRIVE_ERROR_DRV_FAULT)                 > 0) errDescr.concat("Driver fault; ");
+    if ((errorCode & ODRIVE_ERROR_MISSING_INPUT)             > 0) errDescr.concat("Missing input; ");
+    if ((errorCode & ODRIVE_ERROR_DC_BUS_OVER_VOLTAGE)       > 0) errDescr.concat("DC bus overvoltage; ");
+    if ((errorCode & ODRIVE_ERROR_DC_BUS_UNDER_VOLTAGE)      > 0) errDescr.concat("DC bus undervoltage; ");
+    if ((errorCode & ODRIVE_ERROR_DC_BUS_OVER_CURRENT)       > 0) errDescr.concat("DC bus overcurrent; ");
+    if ((errorCode & ODRIVE_ERROR_DC_BUS_OVER_REGEN_CURRENT) > 0) errDescr.concat("DC bus over regeneration; ");
+    if ((errorCode & ODRIVE_ERROR_CURRENT_LIMIT_VIOLATION)   > 0) errDescr.concat("Brake deadtime violation; ");
+    if ((errorCode & ODRIVE_ERROR_MOTOR_OVER_TEMP)           > 0) errDescr.concat("Brake duty cycle NaN; ");
+    if ((errorCode & ODRIVE_ERROR_INVERTER_OVER_TEMP)        > 0) errDescr.concat("Invalid brake resistance; ");
+    if ((errorCode & ODRIVE_ERROR_VELOCITY_LIMIT_VIOLATION)  > 0) errDescr.concat("Velocity limit; ");
+    if ((errorCode & ODRIVE_ERROR_POSITION_LIMIT_VIOLATION)  > 0) errDescr.concat("Position limit; ");
+    if ((errorCode & ODRIVE_ERROR_WATCHDOG_TIMER_EXPIRED)    > 0) errDescr.concat("Watchdog expired; ");
+    if ((errorCode & ODRIVE_ERROR_ESTOP_REQUESTED)           > 0) errDescr.concat("ESTOP requested; ");
+    if ((errorCode & ODRIVE_ERROR_SPINOUT_DETECTED)          > 0) errDescr.concat("Spinout detected; ");
+    if ((errorCode & ODRIVE_ERROR_BRAKE_RESISTOR_DISARMED)   > 0) errDescr.concat("Brake resistor disarmed; ");
+    if ((errorCode & ODRIVE_ERROR_THERMISTOR_DISCONNECTED)   > 0) errDescr.concat("Thermistor disconnected; ");
+    if ((errorCode & ODRIVE_ERROR_CALIBRATION_ERROR)         > 0) errDescr.concat("Calibration error; ");
+    return errDescr;
+}
 
 
 String ODriveArduino::readString() {
