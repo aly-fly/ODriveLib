@@ -2,6 +2,9 @@
 #include "Arduino.h"
 #include "ODriveArduino.h"
 
+#define READ_TIMEOUT 200 // ms <- works fine at 115200 baud
+
+
 // Print with stream operator
 template<class T> inline Print& operator <<(Print& obj, T arg) { obj.print(arg);    return obj; }
 template<>        inline Print& operator <<(Print& obj, float arg) { obj.print(arg, 4); return obj; }
@@ -52,26 +55,42 @@ int32_t ODriveArduino::readInt() {
     return readString().toInt();
 }
 
-bool ODriveArduino::runState(int axis, int requested_state, bool wait_for_idle, float timeout) {
+bool ODriveArduino::runState(int motor_number, int requested_state, bool wait_for_idle, float timeout) {
     int timeout_ctr = (int)(timeout * 10.0F);
-    this->serial_ << "w axis" << axis << ".requested_state " << requested_state << '\n';
+    this->serial_ << "w axis" << motor_number << ".requested_state " << requested_state << '\n';
     if (wait_for_idle) {
         do {
             delay(100);
-            this->serial_ << "r axis" << axis << ".current_state\n";
+            this->serial_ << "r axis" << motor_number << ".current_state\n";
         } while (readInt() != AXIS_STATE_IDLE && --timeout_ctr > 0);
     }
-
     return timeout_ctr > 0;
 }
 
+void ODriveArduino::saveConfig() {
+    this->serial_ << "ss\n";
+}
+
+void ODriveArduino::clearErrors() {
+    this->serial_ << "sc\n";
+}
+
+void ODriveArduino::enableWatchdog(int motor_number, bool enable) {
+    this->serial_ << "w axis" << motor_number << ".config.enable_watchdog " << enable << '\n';
+}
+
+void ODriveArduino::updateWatchdog(int motor_number) {
+    this->serial_ << "u" << motor_number << "\n";
+}
+
+
+
 String ODriveArduino::readString() {
     String str = "";
-    static const uint32_t timeout = 1000;
     uint32_t timeout_start = millis();
     for (;;) {
         while (!this->serial_.available()) {
-            if (millis() - timeout_start >= timeout) {
+            if (millis() - timeout_start >= READ_TIMEOUT) {
                 return str;
             }
         }

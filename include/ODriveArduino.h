@@ -102,14 +102,23 @@ public:
     /**
      * @brief change the axis state of a motor
      * of more info check https://docs.odriverobotics.com/api/odrive.axis.axisstate
-     * @param[in] axis is the motor number, 0 or 1.
+     * @param[in] motor_number is the motor number, 0 or 1.
      * @param[in] requested_state one of the states defined in ODriveEnums.h
      * @param[in] wait_for_idle if true, wait for the state to be reached.
      * @param[in] timeout is the timeout in milliseconds (optional) *default 10*.
      * @return true the state was reached within the timeout.
      * @return false the state was not reached within the timeout.
      */
-    bool runState(int axis, int requested_state, bool wait_for_idle, float timeout = 10.0f);
+    bool runState(int motor_number, int requested_state, bool wait_for_idle, float timeout = 10.0f);
+
+
+    void saveConfig();
+
+    void clearErrors();
+
+    void updateWatchdog(int motor_number);
+
+    void enableWatchdog(int motor_number, bool enable);
 
     /**
      * @brief Read a response from the ODrive in serial.
